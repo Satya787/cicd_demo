@@ -102,7 +102,7 @@ jobs:
           dbt deps --profiles-dir .
 
       - name: Deploy the dbt project
-        run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection dev
+        run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection devlop
 
       - name: List dbt projects
         run: snow dbt list --connection devlop
