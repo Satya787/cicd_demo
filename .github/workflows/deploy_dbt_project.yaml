@@ -109,6 +109,8 @@ jobs:
 
       - name: Execute dbt run
         run: snow dbt execute DEMO_DBT_PROJECT run --target dev --select models/staging/stg_orders.sql
+      - name: Execute dbt run
+        run: snow dbt execute DEMO_DBT_PROJECT run --target dev --select models/mart/sales_summary.sql
 
       - name: Execute dbt test
-        run: snow dbt execute DEMO_DBT_PROJECT test --target dev --select models/marts/sales_summary.sql
+        run: snow dbt execute DEMO_DBT_PROJECT test --target dev --select models/staging/schema.yml
