@@ -102,13 +102,13 @@ jobs:
           dbt deps --profiles-dir .
 
       - name: Deploy the dbt project
-        run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection devlop
+        run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection dev
 
       - name: List dbt projects
         run: snow dbt list --connection devlop
 
       - name: Execute dbt run
-        run: snow dbt execute DEMO_DBT_PROJECT run --target devlop --select models/staging/stg_orders.sql
+        run: snow dbt execute DEMO_DBT_PROJECT run --target dev --select models/staging/stg_orders.sql
 
       - name: Execute dbt test
-        run: snow dbt execute DEMO_DBT_PROJECT test --target devlop --select models/marts/sales_summary.sql
+        run: snow dbt execute DEMO_DBT_PROJECT test --target dev --select models/marts/sales_summary.sql
