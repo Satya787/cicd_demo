@@ -53,3 +53,40 @@ Internal Error
 [0m11:30:48.145383 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000022789AE3500>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002278C5D0110>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002278C577E60>]}
 [0m11:30:48.145383 [debug] [MainThread]: Flushing usage events
 [0m11:30:49.661415 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m10:41:37.571164 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021393E4AAE0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021393E489E0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021393E481A0>]}
+
+
+============================== 10:41:37.579207 | 81b79a24-cff9-4821-982d-97a507f5a7d7 ==============================
+[0m10:41:37.579207 [info ] [MainThread]: Running with dbt=1.11.9
+[0m10:41:37.579207 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'profiles_dir': 'C:\\Users\\satya\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'indirect_selection': 'eager', 'use_colors': 'True', 'invocation_command': 'dbt debug', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m10:41:37.610422 [info ] [MainThread]: dbt version: 1.11.9
+[0m10:41:37.611870 [info ] [MainThread]: python version: 3.12.1
+[0m10:41:37.611870 [info ] [MainThread]: python path: C:\snowflake_dbt_cicd_demo\.venv\Scripts\python.exe
+[0m10:41:37.611870 [info ] [MainThread]: os info: Windows-11-10.0.26200-SP0
+[0m10:41:38.072004 [debug] [MainThread]: Snowflake adapter: Setting snowflake.connector to ERROR (file logging only)
+[0m10:41:38.072004 [debug] [MainThread]: Snowflake adapter: Setting botocore to ERROR (file logging only)
+[0m10:41:38.074012 [debug] [MainThread]: Snowflake adapter: Setting boto3 to ERROR (file logging only)
+[0m10:41:38.188121 [error] [MainThread]: Encountered an error:
+Parsing Error
+  Env var required but not provided: 'SNOWFLAKE_ACCOUNT'
+[0m10:41:38.188121 [debug] [MainThread]: Command `dbt debug` failed at 10:41:38.188121 after 0.78 seconds
+[0m10:41:38.190128 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000213943E4E30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000213963C4200>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000213964A7E60>]}
+[0m10:41:38.190128 [debug] [MainThread]: Flushing usage events
+[0m10:41:40.106655 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m10:49:21.887987 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000018578837B00>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000185788BC770>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001857C4DC0E0>]}
+
+
+============================== 10:49:21.894111 | ad78d95c-29b2-48a8-8c4f-5cbe9e268bc4 ==============================
+[0m10:49:21.894111 [info ] [MainThread]: Running with dbt=1.11.9
+[0m10:49:21.898217 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'empty': 'None', 'log_cache_events': 'False', 'introspect': 'True', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'profiles_dir': 'C:\\Users\\satya\\.dbt', 'indirect_selection': 'eager', 'use_colors': 'True', 'invocation_command': 'dbt debug', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m10:49:21.912756 [info ] [MainThread]: dbt version: 1.11.9
+[0m10:49:21.912756 [info ] [MainThread]: python version: 3.12.1
+[0m10:49:21.912756 [info ] [MainThread]: python path: C:\snowflake_dbt_cicd_demo\.venv\Scripts\python.exe
+[0m10:49:21.912756 [info ] [MainThread]: os info: Windows-11-10.0.26200-SP0
+[0m10:49:21.912756 [error] [MainThread]: Encountered an error:
+Parsing Error
+  Env var required but not provided: 'SNOWFLAKE_ACCOUNT'
+[0m10:49:21.912756 [debug] [MainThread]: Command `dbt debug` failed at 10:49:21.912756 after 0.19 seconds
+[0m10:49:21.912756 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000185788BC770>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001857D7041D0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001857D730050>]}
+[0m10:49:21.912756 [debug] [MainThread]: Flushing usage events
+[0m10:49:23.581177 [debug] [MainThread]: An error was encountered while trying to flush usage events
