@@ -22,11 +22,15 @@ Example:
 repo:my-org/snowflake_dbt_cicd_demo:environment:dev
 ```
 
-## 2. Create the Snowflake service user
+## 2. Create the deploy role and service user
 
 Run this as a Snowflake administrator. Replace the placeholders before running.
 
 ```sql
+USE ROLE SECURITYADMIN;
+
+CREATE ROLE IF NOT EXISTS DBT_DEPLOY_ROLE;
+
 USE ROLE USERADMIN;
 
 CREATE USER GITHUB_DBT_DEPLOY_SVC
@@ -58,8 +62,6 @@ Adjust names to match your database, schema, warehouse, and deployment model.
 ```sql
 USE ROLE SECURITYADMIN;
 
-CREATE ROLE IF NOT EXISTS DBT_DEPLOY_ROLE;
-
 GRANT USAGE ON WAREHOUSE <warehouse_name> TO ROLE DBT_DEPLOY_ROLE;
 GRANT USAGE ON DATABASE <database_name> TO ROLE DBT_DEPLOY_ROLE;
 GRANT USAGE ON SCHEMA <database_name>.<schema_name> TO ROLE DBT_DEPLOY_ROLE;
@@ -80,7 +82,7 @@ Create the `dev` environment in GitHub:
 2. Create environment `dev`.
 3. Optional but recommended: add environment protection rules or required reviewers.
 
-Keep these GitHub secrets or environment secrets:
+Set these as GitHub repository or environment variables:
 
 ```text
 SNOWFLAKE_ACCOUNT

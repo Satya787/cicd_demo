@@ -16,12 +16,12 @@ jobs:
     environment: dev
 
     env:
-      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
-      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
-      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
+      SNOWFLAKE_ACCOUNT: ${{ vars.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
+      SNOWFLAKE_DATABASE: ${{ vars.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: ${{ vars.SNOWFLAKE_SCHEMA }}
+      SNOWFLAKE_WAREHOUSE: ${{ vars.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
       DBT_PROJECT_DIR: cicd_demo
       DBT_PROJECT_NAME: DEMO_DBT_PROJECT
 
@@ -100,7 +100,7 @@ jobs:
         run: snow dbt execute "$DBT_PROJECT_NAME" run --target dev --select models/staging/stg_orders.sql
 
       - name: Execute dbt mart model
-        run: snow dbt execute "$DBT_PROJECT_NAME" run --target dev --select models/mart/sales_summary.sql
+        run: snow dbt execute "$DBT_PROJECT_NAME" run --target dev --select models/marts/sales_summary.sql
 
       - name: Execute dbt tests
         run: snow dbt execute "$DBT_PROJECT_NAME" test --target dev --select models/staging/schema.yml
