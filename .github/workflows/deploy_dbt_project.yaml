@@ -1,9 +1,10 @@
-name: Deploy dbt Project
 
 on:
   push:
     branches:
       - main
+
+  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -16,57 +17,65 @@ jobs:
     environment: dev
 
     env:
-      SNOWFLAKE_ACCOUNT: ${{ vars.SNOWFLAKE_ACCOUNT }}
-      SNOWFLAKE_USER: ${{ vars.SNOWFLAKE_USER }}
-      SNOWFLAKE_DATABASE: ${{ vars.SNOWFLAKE_DATABASE }}
-      SNOWFLAKE_SCHEMA: ${{ vars.SNOWFLAKE_SCHEMA }}
-      SNOWFLAKE_WAREHOUSE: ${{ vars.SNOWFLAKE_WAREHOUSE }}
-      SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
-      DBT_PROJECT_DIR: cicd_demoy
-      DBT_PROJECT_NAME: DEMO_DBT_PROJECT
+      SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+      SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
+      SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+      SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
+      SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
+      SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+      SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          persist-credentials: false
 
       - name: Setup Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Snowflake CLI with GitHub OIDC
-        uses: snowflakedb/snowflake-cli-action@v2
-        with:
-          use-oidc: true
-          cli-version: '3.16'
-          oidc-token-name: SNOWFLAKE_CONNECTIONS_DEVELOP_TOKEN
+      - name: Install Snowflake CLI
+        uses: snowflakedb/snowflake-cli-action@v2.0
+        # removed use-oidc: true
 
+      - name: Write private key to file
+        run: |
+          cat << 'EOF' > /tmp/rsa_key.p8
+          ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
+          EOF
+          chmod 600 /tmp/rsa_key.p8
+          echo "--- First line ---"
+          head -1 /tmp/rsa_key.p8
+          echo "--- Last line ---"
+          tail -1 /tmp/rsa_key.p8
+          echo "--- Line count ---"
+          wc -l /tmp/rsa_key.p8
+                    
       - name: Create Snowflake connection config
         run: |
           mkdir -p ~/.snowflake
           cat > ~/.snowflake/config.toml <<EOF
-          default_connection_name = "develop"
-
-          [connections.develop]
+          default_connection_name = "devlop"
+          
+          [connections.devlop]
           account = "$SNOWFLAKE_ACCOUNT"
           user = "$SNOWFLAKE_USER"
-          authenticator = "WORKLOAD_IDENTITY"
-          workload_identity_provider = "OIDC"
+          private_key_path = "/tmp/rsa_key.p8"
+          authenticator = "SNOWFLAKE_JWT"
           database = "$SNOWFLAKE_DATABASE"
           schema = "$SNOWFLAKE_SCHEMA"
           warehouse = "$SNOWFLAKE_WAREHOUSE"
           role = "$SNOWFLAKE_ROLE"
           EOF
           chmod 0600 ~/.snowflake/config.toml
-
-      - name: Test Snowflake OIDC connection
-        run: snow connection test --connection develop
+          echo "--- config.toml contents ---"
+          cat ~/.snowflake/config.toml
+      - name: Test the Snowflake CLI connection
+        run: snow connection test --connection devlop
 
       - name: Create dbt profiles.yml
         run: |
-          cat > "$DBT_PROJECT_DIR/profiles.yml" <<EOF
+          cat > ./cicd_demo/profiles.yml << EOF
           cicd_demo:
             target: dev
             outputs:
@@ -74,33 +83,27 @@ jobs:
                 type: snowflake
                 account: "$SNOWFLAKE_ACCOUNT"
                 user: "$SNOWFLAKE_USER"
-                authenticator: WORKLOAD_IDENTITY
-                workload_identity_provider: OIDC
-                token: "{{ env_var('SNOWFLAKE_CONNECTIONS_DEVELOP_TOKEN') }}"
+                private_key_path: "/tmp/rsa_key.p8"
+                authenticator: jwt
                 role: "$SNOWFLAKE_ROLE"
                 database: "$SNOWFLAKE_DATABASE"
                 warehouse: "$SNOWFLAKE_WAREHOUSE"
                 schema: "$SNOWFLAKE_SCHEMA"
                 threads: 4
           EOF
-
-      - name: Install dbt and dependencies
+      - name: Install dbt and run deps
         run: |
           pip install dbt-snowflake
-          cd "$DBT_PROJECT_DIR"
+          cd cicd_demo
           dbt deps --profiles-dir .
-
-      - name: Deploy dbt project to Snowflake
-        run: snow dbt deploy "$DBT_PROJECT_NAME" --source "./$DBT_PROJECT_DIR" --force --connection develop
+      - name: Deploy the dbt project
+        run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection devlop
 
       - name: List dbt projects
-        run: snow dbt list --connection develop
+        run: snow dbt list --connection devlop
 
-      - name: Execute dbt staging model
-        run: snow dbt execute "$DBT_PROJECT_NAME" run --target dev --select models/staging/stg_orders.sql
+      - name: Execute dbt run
+        run: snow dbt execute DEMO_DBT_PROJECT run --target dev --select models/staging/stg_orders.sql
 
-      - name: Execute dbt mart model
-        run: snow dbt execute "$DBT_PROJECT_NAME" run --target dev --select models/marts/sales_summary.sql
-
-      - name: Execute dbt tests
-        run: snow dbt execute "$DBT_PROJECT_NAME" test --target dev --select models/staging/schema.yml
+      - name: Execute dbt test
+        run: snow dbt execute DEMO_DBT_PROJECT test --target dev --select models/marts/sales_summary.sql
