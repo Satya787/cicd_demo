@@ -1,11 +1,11 @@
 -- setup/demo.sql
 
 -- 1. Create database
-CREATE DATABASE IF NOT EXISTS cicd_demo;
-CREATE SCHEMA IF NOT EXISTS cicd_demo.raw;
+CREATE DATABASE IF NOT EXISTS demo_db;
+CREATE SCHEMA IF NOT EXISTS demo_db.public;
 
 -- 2. Create table
-CREATE OR REPLACE TABLE cicd_demo.raw.orders (
+CREATE OR REPLACE TABLE demo_db.public.orders (
     order_id INT,
     customer_name STRING,
     product STRING,
@@ -14,7 +14,7 @@ CREATE OR REPLACE TABLE cicd_demo.raw.orders (
 );
 
 -- 3. Insert sample data
-INSERT INTO cicd_demo.raw.orders VALUES
+INSERT INTO demo_db.public.orders VALUES
 (1, 'Amit', 'Pizza', 250, '2025-01-01'),
 (2, 'Rahul', 'Burger', 150, '2025-01-02'),
 (3, 'Sneha', 'Pizza', 300, '2025-01-02'),
@@ -22,4 +22,4 @@ INSERT INTO cicd_demo.raw.orders VALUES
 (5, 'Amit', 'Burger', 180, '2025-01-03');
 
 -- 4. Verify
-SELECT * FROM cicd_demo.raw.orders;
+SELECT * FROM demo_db.public.orders;
