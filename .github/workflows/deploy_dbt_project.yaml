@@ -64,6 +64,25 @@ jobs:
           cd cicd_demo
           dbt deps --profiles-dir .
 
+      - name: Create dbt profiles.yml
+        run: |
+          cat > ./cicd_demo/profiles.yml <<EOF
+          cicd_demo:
+            target: dev
+            outputs:
+              dev:
+                type: snowflake
+                account: "$SNOWFLAKE_ACCOUNT"
+                user: "$SNOWFLAKE_USER"
+                authenticator: WORKLOAD_IDENTITY
+                workload_identity_provider: OIDC
+                role: "$SNOWFLAKE_ROLE"
+                database: "$SNOWFLAKE_DATABASE"
+                warehouse: "$SNOWFLAKE_WAREHOUSE"
+                schema: "$SNOWFLAKE_SCHEMA"
+                threads: 4
+          EOF
+
       - name: Deploy the dbt project
         run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection devlop
 
