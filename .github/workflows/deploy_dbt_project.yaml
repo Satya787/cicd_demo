@@ -1,10 +1,10 @@
+name: CI/CD Pipeline
 
 on:
   push:
     branches:
       - main
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 permissions:
@@ -19,91 +19,69 @@ jobs:
     env:
       SNOWFLAKE_ACCOUNT: ${{ secrets.SNOWFLAKE_ACCOUNT }}
       SNOWFLAKE_USER: ${{ secrets.SNOWFLAKE_USER }}
-      SNOWFLAKE_PRIVATE_KEY: ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
       SNOWFLAKE_DATABASE: ${{ secrets.SNOWFLAKE_DATABASE }}
       SNOWFLAKE_SCHEMA: ${{ secrets.SNOWFLAKE_SCHEMA }}
       SNOWFLAKE_WAREHOUSE: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
       SNOWFLAKE_ROLE: ${{ secrets.SNOWFLAKE_ROLE }}
 
     steps:
-      - name: Checkout repository
+
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Python 3.10
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Snowflake CLI
-        uses: snowflakedb/snowflake-cli-action@v2.0
-        # removed use-oidc: true
-
-      - name: Write private key to file
+      - name: Install Snowflake CLI + dbt
         run: |
-          cat << 'EOF' > /tmp/rsa_key.p8
-          ${{ secrets.SNOWFLAKE_PRIVATE_KEY }}
-          EOF
-          chmod 600 /tmp/rsa_key.p8
-          echo "--- First line ---"
-          head -1 /tmp/rsa_key.p8
-          echo "--- Last line ---"
-          tail -1 /tmp/rsa_key.p8
-          echo "--- Line count ---"
-          wc -l /tmp/rsa_key.p8
-                    
-      - name: Create Snowflake connection config
+          pip install snowflake-cli-labs
+          pip install dbt-snowflake
+
+      - name: Write private key
+        run: |
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > ~/.ssh/rsa_key.p8
+          chmod 600 ~/.ssh/rsa_key.p8
+
+      - name: Create Snowflake config
         run: |
           mkdir -p ~/.snowflake
+
           cat > ~/.snowflake/config.toml <<EOF
           default_connection_name = "devlop"
-          
+
           [connections.devlop]
           account = "$SNOWFLAKE_ACCOUNT"
           user = "$SNOWFLAKE_USER"
-          private_key_path = "/tmp/rsa_key.p8"
+          private_key_path = "/home/runner/.ssh/rsa_key.p8"
           authenticator = "SNOWFLAKE_JWT"
+          warehouse = "$SNOWFLAKE_WAREHOUSE"
           database = "$SNOWFLAKE_DATABASE"
           schema = "$SNOWFLAKE_SCHEMA"
-          warehouse = "$SNOWFLAKE_WAREHOUSE"
           role = "$SNOWFLAKE_ROLE"
           EOF
-          chmod 0600 ~/.snowflake/config.toml
-          echo "--- config.toml contents ---"
-          cat ~/.snowflake/config.toml
-      - name: Test the Snowflake CLI connection
+
+      - name: Test Snowflake connection
         run: snow connection test --connection devlop
 
-      - name: Create dbt profiles.yml
+      - name: Install dbt dependencies
         run: |
-          cat > ./cicd_demo/profiles.yml << EOF
-          cicd_demo:
-            target: dev
-            outputs:
-              dev:
-                type: snowflake
-                account: "$SNOWFLAKE_ACCOUNT"
-                user: "$SNOWFLAKE_USER"
-                private_key_path: "/tmp/rsa_key.p8"
-                authenticator: jwt
-                role: "$SNOWFLAKE_ROLE"
-                database: "$SNOWFLAKE_DATABASE"
-                warehouse: "$SNOWFLAKE_WAREHOUSE"
-                schema: "$SNOWFLAKE_SCHEMA"
-                threads: 4
-          EOF
-      - name: Install dbt and run deps
-        run: |
-          pip install dbt-snowflake
           cd cicd_demo
-          dbt deps --profiles-dir .
-      - name: Deploy the dbt project
-        run: snow dbt deploy DEMO_DBT_PROJECT --source ./cicd_demo --force --connection devlop
+          dbt deps
 
-      - name: List dbt projects
-        run: snow dbt list --connection devlop
+      - name: dbt debug
+        run: |
+          cd cicd_demo
+          dbt debug
 
-      - name: Execute dbt run
-        run: snow dbt execute DEMO_DBT_PROJECT run --target dev --select models/staging/stg_orders.sql
+      - name: dbt run
+        run: |
+          cd cicd_demo
+          dbt run
 
-      - name: Execute dbt test
-        run: snow dbt execute DEMO_DBT_PROJECT test --target dev --select models/marts/sales_summary.sql
+      - name: dbt test
+        run: |
+          cd cicd_demo
+          dbt test
