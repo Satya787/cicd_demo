@@ -22,7 +22,7 @@ jobs:
       SNOWFLAKE_SCHEMA: ${{ vars.SNOWFLAKE_SCHEMA }}
       SNOWFLAKE_WAREHOUSE: ${{ vars.SNOWFLAKE_WAREHOUSE }}
       SNOWFLAKE_ROLE: ${{ vars.SNOWFLAKE_ROLE }}
-      DBT_PROJECT_DIR: cicd_demo
+      DBT_PROJECT_DIR: cicd_demoy
       DBT_PROJECT_NAME: DEMO_DBT_PROJECT
 
     steps:
