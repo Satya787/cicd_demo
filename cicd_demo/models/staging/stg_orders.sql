@@ -4,4 +4,4 @@ select
     product,
     amount,
     order_date
-from demo_db.public.orders
+from cicd_demo.raw.orders
