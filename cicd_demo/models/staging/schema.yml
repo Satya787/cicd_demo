@@ -12,3 +12,4 @@ models:
       - name: product
         tests:
           - not_null
+          - unique
